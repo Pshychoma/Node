@@ -1,0 +1,100 @@
+const express = require('express');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+
+const app = express();
+const port = 3000;
+
+// Подключение к MongoDB (предварительно запустите MongoDB на вашем компьютере)
+mongoose.connect('mongodb://localhost:27017/articleDB', { useNewUrlParser: true, useUnifiedTopology: true });
+
+// Создание схемы для статьи
+const articleSchema = new mongoose.Schema({
+    title: String,
+    content: String
+});
+
+// Создание модели для статьи
+const Article = mongoose.model('Article', articleSchema);
+
+app.set('view engine', 'ejs');
+
+// Промежуточное ПО для обработки JSON и urlencoded данных
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static('public'));
+
+// Рендеринг домашней страницы со списком статей
+app.get('/', (req, res) => {
+    Article.find({}, (err, articles) => {
+        if (!err) {
+            res.render('home', { articles: articles });
+        }
+    });
+});
+
+// Рендеринг страницы для создания новой статьи
+app.get('/compose', (req, res) => {
+    res.render('compose');
+});
+
+// Обработка POST запроса для создания новой статьи
+app.post('/compose', (req, res) => {
+    const { title, content } = req.body;
+    
+    const newArticle = new Article({
+        title: title,
+        content: content
+    });
+
+    newArticle.save((err) => {
+        if (!err) {
+            res.redirect('/');
+        }
+    });
+});
+
+// Слушаем порт 3000
+app.listen(port, () => {
+    console.log(`Сервер запущен на http://localhost:${port}`);
+});
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+</head>
+<body>
+    <h1>Домашняя страница</h1>
+    
+    <% articles.forEach(function(article) { %>
+        <h2><%= article.title %></h2>
+        <p><%= article.content %></p>
+    <% }); %>
+
+    <a href="/compose">Создать новую статью</a>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compose</title>
+</head>
+<body>
+    <h1>Создать новую статью</h1>
+    
+    <form action="/compose" method="post">
+        <label for="title">Заголовок:</label>
+        <input type="text" name="title" required>
+        
+        <label for="content">Содержание:</label>
+        <textarea name="content" required></textarea>
+        
+        <button type="submit">Опубликовать</button>
+    </form>
+
+    <a href="/">На домашнюю страницу</a>
+</body>
+</html>
