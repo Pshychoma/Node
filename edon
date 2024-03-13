@@ -19,14 +19,6 @@ const Article = mongoose.model('Article', articleSchema);
 
 app.set('view engine', 'ejs');
 
-// Промежуточное ПО для обработки JSON и urlencoded данных
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static('public'));
-
-// Рендеринг домашней страницы со списком статей
-app.get('/', (req, res) => {
-    Article.find({}, (err, articles) => {
-        if (!err) {
             res.render('home', { articles: articles });
         }
     });
