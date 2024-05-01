@@ -4,10 +4,6 @@ const bodyParser = require('body-parser');
 
 const app = express();
 const port = 3000;
-
-// Подключение к MongoDB (предварительно запустите MongoDB на вашем компьютере)
-mongoose.connect('mongodb://localhost:27017/articleDB', { useNewUrlParser: true, useUnifiedTopology: true });
-
 // Создание схемы для статьи
 const articleSchema = new mongoose.Schema({
     title: String,
