@@ -7,16 +7,7 @@ const port = 3000;
 // Создание схемы для статьи
 const articleSchema = new mongoose.Schema({
     title: String,
-    content: String
-});
-
-// Создание модели для статьи
-const Article = mongoose.model('Article', articleSchema);
-
-app.set('view engine', 'ejs');
-
-            res.render('home', { articles: articles });
-        }
+    content: 
     });
 });
 
